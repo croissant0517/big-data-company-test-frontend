@@ -7,10 +7,7 @@ import logo from './taipeilogo.png';
 import { ReactComponent as Spinner } from "./Ellipsis-1s-200px.svg";
 import './App.css';
 
-const API_URL = (process.env.NODE_ENV === "development") ? 
-"http://localhost:8001"
-:
-"https://morning-tundra-22660.herokuapp.com"
+const API_URL = "https://www.ris.gov.tw/rs-opendata/api/v1/datastore/ODRP019/110"
 
 let keys = []
 
@@ -22,10 +19,10 @@ for (let i = 1; i < 13; i++) {
   }
 }
 
-let taipeiData = [];
+let splittedData = [];
 
 for (let i = 0; i < keys.length; i++) {
-  taipeiData[i] = {
+  splittedData[i] = {
     id: i,
     items: []
   };
@@ -38,36 +35,27 @@ function App() {
 
   useEffect(() => {
     setIsFetching(true);
-    fetch(`${API_URL}/taipei`)
+    let taipeiData = []
+    fetch(API_URL)
     .then(res => res.json())
-    .then(datas => {
+    .then(data => {
+      // 將台北市資料篩選出來
+      data.responseData.forEach(eachData => {
+        if (eachData.district_code[0] + eachData.district_code[1] === "63") {
+          taipeiData.push(eachData)
+        }
+      })
       // 將資料依據行政區分為12個區
-      datas.forEach(data => {
+      taipeiData.forEach(data => {
         for (let i = 0; i < keys.length; i++) {
           if(data.district_code[5] + data.district_code[6] === keys[i]) {
-            taipeiData[i].items.push(data);
+            splittedData[i].items.push(data);
           }
         }
       })
-      setData(taipeiData)
+      setData(splittedData)
       setIsFetching(false);
     })
-
-    // fetch("https://hidden-fjord-43434.herokuapp.com/https://od.moi.gov.tw/api/v1/rest/datastore/301000000A-000082-041")
-    // .then(res => res.json())
-    // .then(datas => {
-    //   console.log(datas);
-      // 將資料依據行政區分為12個區
-      // datas.forEach(data => {
-      //   for (let i = 0; i < keys.length; i++) {
-      //     if(data.district_code[5] + data.district_code[6] === keys[i]) {
-      //       taipeiData[i].items.push(data);
-      //     }
-      //   }
-      // })
-      // setData(taipeiData)
-      // setIsFetching(false);
-    // })
   }, [])
 
   return (
