@@ -1,0 +1,11 @@
+.histogram-container {
+    width: 100vw;
+    height: 60vh;
+}
+
+@media screen and (max-width: 900px) {
+    .histogram-container {
+        width: 100vw;
+        height: 80vh;
+    }
+}
